@@ -54,6 +54,28 @@ def agregar_prospectos(sheet_id, filas):
         body={"values": filas}
     ).execute()
 
+def leer_filas(sheet_id):
+    """Devuelve la lista de filas de datos (sin encabezado). Cada fila trae ademas
+    su numero de fila real en la planilla como ultimo elemento (para poder actualizarla)."""
+    creds = _creds()
+    sheets = build("sheets", "v4", credentials=creds)
+    result = sheets.spreadsheets().values().get(spreadsheetId=sheet_id, range="A2:H1000").execute()
+    valores = result.get("values", [])
+    filas = []
+    for i, fila in enumerate(valores):
+        fila = fila + [""] * (8 - len(fila))
+        filas.append(fila + [i + 2])
+    return filas
+
+def actualizar_estado(sheet_id, numero_de_fila, nuevo_estado):
+    """numero_de_fila es el numero real de fila en la planilla (columna H de esa fila)."""
+    creds = _creds()
+    sheets = build("sheets", "v4", credentials=creds)
+    sheets.spreadsheets().values().update(
+        spreadsheetId=sheet_id, range=f"H{numero_de_fila}",
+        valueInputOption="RAW", body={"values": [[nuevo_estado]]}
+    ).execute()
+
 if __name__ == "__main__":
     sid = obtener_o_crear_planilla()
     print(f"Planilla lista: https://docs.google.com/spreadsheets/d/{sid}")
