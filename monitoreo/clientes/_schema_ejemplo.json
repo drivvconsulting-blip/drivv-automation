@@ -1,0 +1,21 @@
+{
+  "_comentario": "Este archivo documenta el schema, no es un cliente real. No lo marques activo:true.",
+  "cliente_id": "nombre-del-cliente",
+  "nombre": "Nombre para mostrar en el reporte",
+  "url": "https://sitio-del-cliente.com",
+  "activo": false,
+  "timeout_ms": 15000,
+  "umbral_tiempo_carga_ms": 4000,
+  "elementos_criticos": [
+    {
+      "nombre": "Botón agregar al carrito",
+      "selector": "button[name='add'], .product-form__submit, [data-add-to-cart]",
+      "requerido": true
+    },
+    {
+      "nombre": "Formulario de contacto",
+      "selector": "form#contact, form[action*='contact']",
+      "requerido": false
+    }
+  ]
+}

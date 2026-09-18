@@ -1,0 +1,16 @@
+{
+  "_comentario": "Solo para la verificación técnica end-to-end del sistema de monitoreo. No es el piloto del retainer ni un cliente que esté pagando por esto.",
+  "cliente_id": "cristallia-demo",
+  "nombre": "Cristallia Store",
+  "url": "https://cristalliastore.com",
+  "activo": false,
+  "timeout_ms": 15000,
+  "umbral_tiempo_carga_ms": 4000,
+  "elementos_criticos": [
+    {
+      "nombre": "Botón agregar al carrito",
+      "selector": "button[name='add'], .product-form__submit, [data-add-to-cart]",
+      "requerido": true
+    }
+  ]
+}

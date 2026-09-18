@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reporte de Monitoreo — {{CLIENTE_NOMBRE}} × DRIVV</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{font-family:-apple-system,'Helvetica Neue',Helvetica,Arial,system-ui,sans-serif;background:#080C18;color:#ECEAF8;line-height:1.6;-webkit-font-smoothing:antialiased;}
+::selection{background:#6D28D9;color:#fff;}
+
+:root{
+  --p:#7C3AED;--p2:#6D28D9;--p3:#A78BFA;--p4:rgba(167,139,250,.12);--p5:rgba(109,40,217,.08);
+  --ink:#ECEAF8;--ink2:#D4D2EE;--mid:#9896B0;--dim:#5E5C78;
+  --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.04);
+  --sur:#111827;--bg:#0B0F1A;
+  --r:#EF4444;--r-bg:rgba(239,68,68,.10);
+  --y:#F59E0B;--y-bg:rgba(245,158,11,.10);
+  --g:#16A34A;--g-bg:rgba(22,163,74,.10);
+  --navy:#080C18;
+}
+
+.wrap{max-width:980px;margin:0 auto;padding:0 40px;}
+@media(max-width:640px){.wrap{padding:0 18px;}}
+
+/* HEADER (version compacta del cover de diagnostico, sin 100vh) */
+.cover{background:var(--navy);position:relative;overflow:hidden;padding:40px 0 40px;}
+.cover::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.055) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;}
+.cover-blob1{position:absolute;top:-120px;right:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(109,40,217,.30) 0%,transparent 70%);pointer-events:none;}
+.cover-top{position:relative;z-index:2;}
+.cover-top .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;}
+.cover-logo{display:flex;align-items:center;gap:10px;}
+.cover-logo-name{font-size:12px;font-weight:900;letter-spacing:.35em;color:var(--p3);text-transform:uppercase;}
+.cover-doc-type{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.12);padding:5px 14px;border-radius:3px;}
+.cover-body{position:relative;z-index:2;padding:40px 0 0;}
+.cover-eyebrow{font-size:10px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--p3);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.cover-eyebrow::before{content:'';display:inline-block;width:24px;height:1px;background:var(--p3);}
+.cover-headline{font-size:clamp(30px,5vw,48px);font-weight:900;line-height:1.05;letter-spacing:-.03em;color:#fff;margin-bottom:16px;}
+.cover-headline span{color:var(--p3);}
+.cover-bottom{position:relative;z-index:2;border-top:1px solid rgba(255,255,255,.08);margin-top:36px;}
+.cover-bottom .wrap{display:flex;gap:0;padding-top:28px;flex-wrap:wrap;}
+.cover-meta-item{flex:1;min-width:150px;padding-right:32px;border-right:1px solid rgba(255,255,255,.08);margin-right:32px;margin-bottom:12px;}
+.cover-meta-item:last-child{border-right:none;margin-right:0;padding-right:0;}
+.cover-meta-label{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:5px;}
+.cover-meta-value{font-size:14px;font-weight:600;color:rgba(255,255,255,.85);}
+.cover-meta-value.semaforo-rojo{color:var(--r);}
+.cover-meta-value.semaforo-amarillo{color:var(--y);}
+.cover-meta-value.semaforo-verde{color:var(--g);}
+
+/* SECTION */
+.section{padding:56px 0;}
+.section-alt{background:var(--bg);}
+.hr{height:1px;background:var(--line);}
+.section-label{font-size:9px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--p);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.section-label-num{color:rgba(109,40,217,.4);}
+.section-title{font-size:24px;font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:8px;}
+.section-sub{font-size:14px;color:var(--mid);margin-bottom:32px;max-width:540px;line-height:1.65;}
+
+/* GAUGES */
+.gauge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+@media(max-width:760px){.gauge-grid{grid-template-columns:1fr 1fr;}}
+.gauge-card{background:var(--sur);padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;}
+.gauge-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.gauge-card.s-red::after{background:var(--r);}
+.gauge-card.s-yellow::after{background:var(--y);}
+.gauge-card.s-green::after{background:var(--g);}
+.gauge-wrap{position:relative;width:80px;height:80px;}
+.gauge-wrap svg{transform:rotate(-90deg);}
+.gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.gauge-num{font-size:20px;font-weight:900;letter-spacing:-.03em;line-height:1;}
+.gauge-num.r{color:var(--r);}
+.gauge-num.y{color:var(--y);}
+.gauge-num.g{color:var(--g);}
+.gauge-name{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);text-align:center;}
+.gauge-note{font-size:11px;color:var(--dim);text-align:center;line-height:1.5;max-width:160px;}
+
+/* FINDINGS */
+.findings{display:flex;flex-direction:column;gap:2px;}
+.finding{background:var(--sur);border:1px solid var(--line);overflow:hidden;}
+.finding:first-child{border-radius:10px 10px 0 0;}
+.finding:last-child{border-radius:0 0 10px 10px;}
+.finding.f-red{border-left:4px solid var(--r);}
+.finding.f-yellow{border-left:4px solid var(--y);}
+.finding.f-green{border-left:4px solid var(--g);}
+.finding-head{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;padding:20px 22px;}
+.finding-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.finding-icon.r{background:var(--r-bg);}
+.finding-icon.y{background:var(--y-bg);}
+.finding-icon.g{background:var(--g-bg);}
+.finding-badge{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border-radius:4px;white-space:nowrap;}
+.finding-badge.r{background:var(--r-bg);color:var(--r);}
+.finding-badge.y{background:var(--y-bg);color:var(--y);}
+.finding-badge.g{background:var(--g-bg);color:var(--g);}
+.finding-title{font-size:14px;font-weight:700;letter-spacing:-.01em;line-height:1.35;}
+.finding-title small{display:block;font-size:11px;color:var(--dim);font-weight:400;margin-top:3px;}
+
+/* HISTORIAL TABLE */
+.plan-wrap{overflow-x:auto;}
+.plan-table{width:100%;border-collapse:collapse;font-size:13px;}
+.plan-table th{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);padding:12px 16px;text-align:left;border-bottom:2px solid var(--line);background:var(--bg);}
+.plan-table td{padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:top;background:var(--sur);}
+.plan-table tr:last-child td{border-bottom:none;}
+.pill{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:4px;display:inline-block;}
+.pill.rojo{background:var(--r-bg);color:var(--r);}
+.pill.amarillo{background:var(--y-bg);color:var(--y);}
+.pill.verde{background:var(--g-bg);color:var(--g);}
+
+/* FOOTER */
+.doc-footer{background:var(--navy);border-top:1px solid var(--line);padding:28px 40px;max-width:980px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.footer-brand{display:flex;align-items:center;gap:10px;}
+.footer-brand-name{font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);}
+.footer-copy{font-size:11px;color:var(--dim);}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-blob1"></div>
+  <div class="cover-top">
+    <div class="wrap">
+      <div class="cover-logo">
+        <svg width="22" height="18" viewBox="0 0 36 30" fill="none">
+          <path d="M21 2L34 27H27L21 15L15 27H8L21 2Z" fill="#6D28D9"/>
+          <path d="M15 2L28 27H21L15 15L9 27H2L15 2Z" fill="#A78BFA"/>
+        </svg>
+        <span class="cover-logo-name">DRIVV</span>
+      </div>
+      <div class="cover-doc-type">Reporte de Monitoreo · Semanal</div>
+    </div>
+  </div>
+
+  <div class="cover-body">
+    <div class="wrap">
+      <div class="cover-eyebrow">Salud técnica del sitio</div>
+      <h1 class="cover-headline">Estado de <span>{{CLIENTE_NOMBRE}}</span> esta semana.</h1>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="wrap">
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Cliente</div>
+        <div class="cover-meta-value">{{CLIENTE_NOMBRE}}</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Sitio</div>
+        <div class="cover-meta-value">{{URL}}</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Fecha del reporte</div>
+        <div class="cover-meta-value">{{FECHA}}</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Estado general</div>
+        <div class="cover-meta-value semaforo-{{SEMAFORO_GENERAL}}">{{SEMAFORO_GENERAL_LABEL}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="wrap">
+    <div class="section-label"><span class="section-label-num">01</span>Chequeo técnico</div>
+    <h2 class="section-title">Los 4 indicadores de esta semana</h2>
+    <p class="section-sub">Chequeo automático del sitio, corrido esta semana.</p>
+
+    <div class="gauge-grid">
+{{GAUGES}}
+    </div>
+  </div>
+</div>
+
+<div class="hr"></div>
+
+<div class="section section-alt">
+  <div class="wrap">
+    <div class="section-label"><span class="section-label-num">02</span>Hallazgos</div>
+    <h2 class="section-title">Qué encontramos</h2>
+    <p class="section-sub">Ordenado por impacto.</p>
+
+    <div class="findings">
+{{FINDINGS}}
+    </div>
+  </div>
+</div>
+
+<div class="hr"></div>
+
+<div class="section">
+  <div class="wrap">
+    <div class="section-label"><span class="section-label-num">03</span>Historial</div>
+    <h2 class="section-title">Últimas revisiones</h2>
+    <p class="section-sub">Las últimas corridas del chequeo automático.</p>
+
+    <div class="plan-wrap">
+      <table class="plan-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>HTTP</th>
+            <th>Carga</th>
+            <th>Errores consola</th>
+            <th>Elementos</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+{{HISTORIAL}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="doc-footer">
+  <div class="footer-brand">
+    <svg width="18" height="15" viewBox="0 0 36 30" fill="none">
+      <path d="M21 2L34 27H27L21 15L15 27H8L21 2Z" fill="#6D28D9"/>
+      <path d="M15 2L28 27H21L15 15L9 27H2L15 2Z" fill="#A78BFA"/>
+    </svg>
+    <span class="footer-brand-name">DRIVV Consultoría Digital</span>
+  </div>
+  <span class="footer-copy">Reporte generado automáticamente · {{FECHA}}</span>
+</div>
+
+</body>
+</html>

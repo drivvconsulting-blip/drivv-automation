@@ -4,3 +4,5 @@ __pycache__/
 .env-*
 *.json
 !package.json
+!monitoreo/clientes/*.json
+monitoreo/reportes/

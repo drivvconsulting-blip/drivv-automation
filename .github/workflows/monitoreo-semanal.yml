@@ -1,0 +1,36 @@
+name: Monitoreo semanal de clientes
+
+on:
+  schedule:
+    - cron: "0 13 * * 1"   # lunes ~10:00 Chile (Actions corre en UTC, puede desfasar
+                            # ±1h en cambios de horario de verano)
+  workflow_dispatch:        # para correr manual (ej. la verificación con Cristallia)
+
+jobs:
+  chequeo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar dependencias Python
+        run: pip install -r requirements.txt
+      - name: Instalar navegador Playwright
+        run: python -m playwright install --with-deps chromium
+      - name: Correr chequeos y loguear en Sheets
+        env:
+          SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          MONITOREO_DRIVE_FOLDER_ID: ${{ secrets.MONITOREO_DRIVE_FOLDER_ID }}
+        run: python monitoreo/run_chequeo.py
+      - name: Generar reportes HTML de clientes activos
+        env:
+          SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          MONITOREO_DRIVE_FOLDER_ID: ${{ secrets.MONITOREO_DRIVE_FOLDER_ID }}
+        run: python monitoreo/generar_reporte.py --todos-los-activos
+      - name: Subir reportes como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reportes-monitoreo-${{ github.run_id }}
+          path: monitoreo/reportes/*.html
+          retention-days: 45

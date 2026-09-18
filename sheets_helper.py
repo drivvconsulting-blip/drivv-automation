@@ -76,6 +76,51 @@ def actualizar_estado(sheet_id, numero_de_fila, nuevo_estado):
         valueInputOption="RAW", body={"values": [[nuevo_estado]]}
     ).execute()
 
+def obtener_o_crear_planilla_generica(folder_id, sheet_name, headers):
+    """Igual que obtener_o_crear_planilla(): la cuenta de servicio gratuita no tiene
+    cuota propia de Drive, así que no puede crear archivos — la spreadsheet la tiene
+    que crear una persona (con cuota) dentro de la carpeta compartida, y esta función
+    solo la encuentra por nombre y le pone el encabezado si está vacía."""
+    creds = _creds()
+    drive = build("drive", "v3", credentials=creds)
+    sheets = build("sheets", "v4", credentials=creds)
+
+    q = (f"'{folder_id}' in parents and mimeType='application/vnd.google-apps.spreadsheet' "
+         f"and trashed=false and name='{sheet_name}'")
+    res = drive.files().list(q=q, fields="files(id, name)").execute()
+    files = res.get("files", [])
+    if not files:
+        raise RuntimeError(
+            f"No hay ninguna hoja de calculo llamada '{sheet_name}' en esa carpeta de Drive todavia. "
+            f"Creala desde adentro de la carpeta (+ Nuevo > Google Sheets) con ese nombre exacto."
+        )
+    sheet_id = files[0]["id"]
+
+    existente = sheets.spreadsheets().values().get(spreadsheetId=sheet_id, range="A1:A1").execute()
+    if not existente.get("values"):
+        sheets.spreadsheets().values().update(
+            spreadsheetId=sheet_id, range="A1",
+            valueInputOption="RAW", body={"values": [headers]}
+        ).execute()
+    return sheet_id
+
+
+def agregar_filas_genericas(sheet_id, filas):
+    creds = _creds()
+    sheets = build("sheets", "v4", credentials=creds)
+    sheets.spreadsheets().values().append(
+        spreadsheetId=sheet_id, range="A1",
+        valueInputOption="RAW", insertDataOption="INSERT_ROWS",
+        body={"values": filas}
+    ).execute()
+
+
+def leer_filas_genericas(sheet_id, rango):
+    creds = _creds()
+    sheets = build("sheets", "v4", credentials=creds)
+    return sheets.spreadsheets().values().get(spreadsheetId=sheet_id, range=rango).execute().get("values", [])
+
+
 if __name__ == "__main__":
     sid = obtener_o_crear_planilla()
     print(f"Planilla lista: https://docs.google.com/spreadsheets/d/{sid}")
