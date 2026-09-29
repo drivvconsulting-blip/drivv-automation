@@ -76,6 +76,15 @@ def actualizar_estado(sheet_id, numero_de_fila, nuevo_estado):
         valueInputOption="RAW", body={"values": [[nuevo_estado]]}
     ).execute()
 
+def actualizar_telefono(sheet_id, numero_de_fila, telefono):
+    """numero_de_fila es el numero real de fila en la planilla (columna I de esa fila)."""
+    creds = _creds()
+    sheets = build("sheets", "v4", credentials=creds)
+    sheets.spreadsheets().values().update(
+        spreadsheetId=sheet_id, range=f"I{numero_de_fila}",
+        valueInputOption="RAW", body={"values": [[telefono]]}
+    ).execute()
+
 def obtener_o_crear_planilla_generica(folder_id, sheet_name, headers):
     """Igual que obtener_o_crear_planilla(): la cuenta de servicio gratuita no tiene
     cuota propia de Drive, así que no puede crear archivos — la spreadsheet la tiene
