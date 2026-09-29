@@ -6,7 +6,7 @@ from googleapiclient.discovery import build
 DRIVE_FOLDER_ID = os.environ.get("DRIVE_FOLDER_ID", "10J9gF-P8sGmVLuSjwk_F864ZZ5cYQSLb")
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
 SHEET_NAME = "DRIVV Prospectos"
-HEADERS = ["Fecha", "Ronda", "Negocio", "Email", "Rubro", "Oportunidad", "Hallazgo", "Estado"]
+HEADERS = ["Fecha", "Ronda", "Negocio", "Email", "Rubro", "Oportunidad", "Hallazgo", "Estado", "Telefono"]
 
 def _creds():
     info = json.loads(os.environ["SERVICE_ACCOUNT_JSON"])
@@ -59,11 +59,11 @@ def leer_filas(sheet_id):
     su numero de fila real en la planilla como ultimo elemento (para poder actualizarla)."""
     creds = _creds()
     sheets = build("sheets", "v4", credentials=creds)
-    result = sheets.spreadsheets().values().get(spreadsheetId=sheet_id, range="A2:H1000").execute()
+    result = sheets.spreadsheets().values().get(spreadsheetId=sheet_id, range="A2:I1000").execute()
     valores = result.get("values", [])
     filas = []
     for i, fila in enumerate(valores):
-        fila = fila + [""] * (8 - len(fila))
+        fila = fila + [""] * (9 - len(fila))
         filas.append(fila + [i + 2])
     return filas
 
