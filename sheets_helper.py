@@ -41,9 +41,43 @@ def obtener_o_crear_planilla():
 def emails_ya_registrados(sheet_id):
     creds = _creds()
     sheets = build("sheets", "v4", credentials=creds)
-    result = sheets.spreadsheets().values().get(spreadsheetId=sheet_id, range="D2:D1000").execute()
+    result = sheets.spreadsheets().values().get(spreadsheetId=sheet_id, range="D2:D").execute()
     valores = result.get("values", [])
-    return set(v[0].lower() for v in valores if v)
+    return set(v[0].strip().lower() for v in valores if v)
+
+DOMINIOS_GRATUITOS = {
+    "gmail.com", "hotmail.com", "hotmail.es", "yahoo.com", "yahoo.es", "outlook.com",
+    "outlook.es", "live.com", "live.cl", "icloud.com", "msn.com",
+}
+
+def _normalizar_nombre(nombre):
+    import re, unicodedata
+    s = unicodedata.normalize("NFKD", nombre or "").encode("ascii", "ignore").decode().lower()
+    s = re.sub(r"\(.*?\)", " ", s)
+    s = re.sub(r"[^a-z0-9 ]", " ", s)
+    ruido = {"spa", "ltda", "limitada", "sa", "s", "a", "eirl", "cia", "y", "de", "la", "el", "los", "las", "chile", "santiago"}
+    return " ".join(p for p in s.split() if p not in ruido)
+
+def _dominio(email):
+    return email.strip().lower().rsplit("@", 1)[-1] if "@" in (email or "") else ""
+
+def ya_contactado(sheet_id, email, nombre, filas=None):
+    """Devuelve un texto con el motivo si este negocio ya esta en la planilla (mismo
+    email, mismo dominio propio o mismo nombre normalizado), o None si es nuevo.
+    Pasa `filas` (de leer_filas) para no releer la planilla en cada candidato."""
+    filas = filas if filas is not None else leer_filas(sheet_id)
+    email_n = (email or "").strip().lower()
+    dom = _dominio(email_n)
+    nom = _normalizar_nombre(nombre)
+    for f in filas:
+        f_email = (f[3] or "").strip().lower()
+        if email_n and f_email == email_n:
+            return f"mismo email que fila {f[-1]} ({f[2]}, {f[0]}, estado {f[7]})"
+        if dom and dom not in DOMINIOS_GRATUITOS and _dominio(f_email) == dom:
+            return f"mismo dominio que fila {f[-1]} ({f[2]}, {f[0]}, estado {f[7]})"
+        if nom and _normalizar_nombre(f[2]) == nom:
+            return f"mismo nombre que fila {f[-1]} ({f[2]}, {f[0]}, estado {f[7]})"
+    return None
 
 def agregar_prospectos(sheet_id, filas):
     creds = _creds()
